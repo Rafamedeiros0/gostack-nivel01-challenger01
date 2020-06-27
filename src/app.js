@@ -3,6 +3,7 @@ const cors = require("cors");
 const { uuid } = require("uuidv4");
 
 // const { uuid } = require("uuidv4");
+// posso tentar usar middle para validações
 
 const app = express();
 
@@ -36,13 +37,13 @@ app.put("/repositories/:id", (request, response) => {
   const { id } = request.params
   const { title, url, techs } = request.body
 
-  const repositoryIndex = repositories.findIndex(repository => repository.id === id )
+  const findRepositoryIndex = repositories.findIndex(repository => repository.id === id )
 
-  if (repositoryIndex < 0){
+  if (findRepositoryIndex < 0){
     return response.status(400).json({ error:'Repository not found.' })
   }
 
-  const {likes} = repositories[repositoryIndex]
+  const {likes} = repositories[findRepositoryIndex]
 
   const repository = {
     id,
@@ -52,38 +53,38 @@ app.put("/repositories/:id", (request, response) => {
     likes    
   }
 
-  repositories[repositoryIndex] = repository
-  return response.json(repositories[repositoryIndex])
+  repositories[findRepositoryIndex] = repository
 
+  return response.json(repository)
 });
 
 app.delete("/repositories/:id", (request, response) => {
   const { id } = request.params
 
-  const repositoryIndex = repositories.findIndex( repository => repository.id === id)
+  const findRepositoryIndex = repositories.findIndex( repository => repository.id === id)
 
-  if (repositoryIndex < 0) {
-    return response.status(400).json({ error: 'Repository not found.'})
+  if (findRepositoryIndex >= 0) {
+    repositories.splice(findRepositoryIndex, 1)
+    return response.status(204).send()
   }
+  
+  return response.status(400).json({ error: 'Repository not found.'})
 
-  repositories.splice(repositoryIndex, 1)
-
-  return response.status(204).send()
 
 });
 
 app.post("/repositories/:id/like", (request, response) => {
   const {id} = request.params
 
-  const repositoryIndex = repositories.findIndex( repository => repository.id === id)
+  const findRepositoryIndex = repositories.findIndex( repository => repository.id === id)
 
-  if ( repositoryIndex < 0) {
+  if ( findRepositoryIndex < 0) {
     return response.status(400).json({ error: 'Repository not found.' })
   }
 
-  repositories[repositoryIndex].likes++
+  repositories[findRepositoryIndex].likes++
 
-  return response.json(repositories[repositoryIndex])
+  return response.json(repositories[findRepositoryIndex])
 
 });
 
